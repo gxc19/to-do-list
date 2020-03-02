@@ -12,8 +12,8 @@ class App extends Component {
   }
 
   submit = () => {
-    let storeInput = this.state.currentInput
-    if(storeInput === null || storeInput === ""){
+    let storeInput = this.state.list
+    if(this.state.currentInput === ""){
       return alert("Please Type In The Space Below")
     }
     storeInput.push(this.state.currentInput)
