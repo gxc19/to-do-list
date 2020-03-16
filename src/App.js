@@ -7,6 +7,13 @@ class App extends Component {
     currentInput: "",
   }
 
+  componentDidMount = async () => {
+    const response = await fetch("http://localhost:3010/data")
+    const data = await response.json()
+    console.log(data)
+    this.setState({list: data.data})
+  }
+
   addHandler = e => {
     this.setState({ currentInput: e.target.value })
   }
@@ -16,15 +23,31 @@ class App extends Component {
     if(this.state.currentInput === ""){
       return alert("Please Type In The Space Below")
     }
-    storeInput.push(this.state.currentInput)
+    storeInput.push({task: this.state.currentInput})
     this.setState({list: storeInput, currentInput: ""})
     console.log("Hi o/")
+
+    fetch("http://localhost:3010/taskAdd", {
+      method: "POST",
+      headers: {"content-type": "application/json"},
+      body: JSON.stringify({
+      task: this.state.currentInput
+    })
+  })
   }
 
-  removeHandler = index => {
+  removeHandler = (index, task) => {
     let storeList = this.state.list
     storeList.splice(index, 1)
     this.setState({ list: storeList })
+
+    fetch("http://localhost:3010/delete", {
+      method: "POST",
+      headers: {"content-type": "application/json"},
+      body: JSON.stringify({
+      task: task
+    })
+  })
   }
 
   enterHandler = (event) => {
@@ -42,14 +65,17 @@ class App extends Component {
         <div className="to-do-list">
         <button className="button1" onClick={this.submit}>Add</button>
         <input className="text" type="text"  placeholder="Type Here" value={this.state.currentInput} onChange={this.addHandler} onKeyPress={this.enterHandler}/>
-        {this.state.list.map((savedInput, index) => {
+        <div className="list-box">
+          {this.state.list.map((savedInput, index) => {
           return (
             <div className="list">
-              <button className="button2" key={index} onClick={() => this.removeHandler(index)}/>
-              <p>{savedInput}</p>
+              <button className="button2" key={index} onClick={() => this.removeHandler(index, savedInput.task)}/>
+              <p>{savedInput.task}</p>
             </div>
           )
         })}
+        </div>
+        
         </div>
       </div>
     )
